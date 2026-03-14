@@ -581,7 +581,11 @@ pub fn processButton(cursor: *Cursor, event: *const wlr.Pointer.event.Button) vo
 }
 
 pub fn processAxis(cursor: *Cursor, event: *const wlr.Pointer.event.Axis) void {
-    const device: *InputDevice = @ptrCast(@alignCast(event.device.data));
+    const device_data = event.device.data orelse {
+        log.debug("processAxis: device.data is null, skipping", .{});
+        return;
+    };
+    const device: *InputDevice = @ptrCast(@alignCast(device_data));
     cursor.seat.wlr_seat.pointerNotifyAxis(
         event.time_msec,
         event.orientation,
